@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="istic.fr.star2bb.MainActivity">
+
+    <fragment
+        android:id="@+id/fragmentLigne"
+        android:name="istic.fr.star2bb.Fragment.LigneFragment"
+        android:layout_width="361dp"
+        android:layout_height="502dp"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="14dp"
+        tools:layout_editor_absoluteY="-1dp" />
+
+</android.support.constraint.ConstraintLayout>
