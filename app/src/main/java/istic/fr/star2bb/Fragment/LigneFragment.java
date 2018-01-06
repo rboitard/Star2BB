@@ -17,6 +17,8 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,10 +32,12 @@ import istic.fr.star2bb.contract.StarContract;
 
 public class LigneFragment extends Fragment {
 
-    public static LigneFragment newInstance() {
-        return new LigneFragment();
+
+    public interface LigneFragmentCallback {
+        void SelectionLigneClicked(int idBus, int dir);
     }
 
+    private LigneFragmentCallback ligneFragmentCallBack;
     private Button buttonTime;
     private Button buttonDate;
     private TimePickerFragment timePickerFragment;
@@ -41,7 +45,16 @@ public class LigneFragment extends Fragment {
     private Spinner spinnerLigne;
     private Spinner spinnerDirection;
     private HashMap<String, String> mapLigneDir;
+    private HashMap<String, String> mapLigneId;
     private List<String[][]> listLigne;
+
+    private int idBus;
+    private int direction;
+
+
+    public static LigneFragment newInstance() {
+        return new LigneFragment();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,36 +88,31 @@ public class LigneFragment extends Fragment {
         });
 
 
-        Uri uri = Uri.parse("content://fr.istic.starproviderBB/busroute/");
-        ContentProviderClient yourCR = getActivity().getContentResolver().acquireContentProviderClient(uri);
+
 
         String[] projection = new String[]{StarContract.BusRoutes.BusRouteColumns._ID,
                 StarContract.BusRoutes.BusRouteColumns.SHORT_NAME,
                 StarContract.BusRoutes.BusRouteColumns.LONG_NAME,
-                StarContract.BusRoutes.BusRouteColumns.DESCRIPTION,
-                StarContract.BusRoutes.BusRouteColumns.TYPE,
-                StarContract.BusRoutes.BusRouteColumns.COLOR,
-                StarContract.BusRoutes.BusRouteColumns.TEXT_COLOR};
-        String selection = null;
-        String[] selectionArguments = null;
+                StarContract.BusRoutes.BusRouteColumns.COLOR
+                };
+        String selection = "_ID = ?";
+        String[] selectionArguments = new String[] {"101"};
         String sortOrder = null;
 
         listLigne = new ArrayList<String[][]>();
         mapLigneDir = new HashMap<String, String>();
-        try {
-            String  myType = yourCR.getType(uri);
-            Cursor cursor = getActivity().getContentResolver().query(Uri.parse("content://fr.istic.starproviderBB/busroute/"), projection, null, null, null);
-            while (cursor.moveToNext()) {
-                String [][] strings = new String[1][2];
-                strings[0][0] = cursor.getString(1);
-                strings[0][1] = cursor.getString(5);
-                listLigne.add(strings);
-                mapLigneDir.put(cursor.getString(1),cursor.getString(2));
-            }
+        mapLigneId = new HashMap<String, String>();
+
+        Cursor cursor = getActivity().getContentResolver().query(Uri.parse("content://fr.istic.starproviderBB/busroute/"), projection, null, null, null);
+        while (cursor.moveToNext()) {
+            String [][] strings = new String[1][2];
+            strings[0][0] = cursor.getString(1);
+            strings[0][1] = cursor.getString(3);
+            listLigne.add(strings);
+            mapLigneDir.put(cursor.getString(1),cursor.getString(2));
+            mapLigneId.put(cursor.getString(1),cursor.getString(0));
         }
-        catch (RemoteException e) {
-            e.printStackTrace();
-        }
+
         spinnerLigne = (Spinner) getView().findViewById(R.id.spinnerLigne);
         spinnerDirection = (Spinner) getView().findViewById(R.id.spinnerDirection);
         addItemOnSpinner(spinnerLigne, listLigne);
@@ -112,6 +120,7 @@ public class LigneFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String ligne = mapLigneDir.get(((TextView)selectedItemView).getText());
+                idBus = Integer.parseInt(mapLigneId.get(((TextView)selectedItemView).getText()));
                 List<String> listDir = new ArrayList<String>();
                 String[] strings = ligne.split("<>");
                 listDir.add(strings[0]);
@@ -127,7 +136,31 @@ public class LigneFragment extends Fragment {
             }
 
         });
+        spinnerDirection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                direction = position;
+                System.out.println(idBus + " / " + direction);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
+
+        Button buttonValider = (Button) getView().findViewById(R.id.buttonValider);
+        buttonValider.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(ligneFragmentCallBack != null)
+                    ligneFragmentCallBack.SelectionLigneClicked(idBus, direction);
+            }
+        });
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -143,19 +176,16 @@ public class LigneFragment extends Fragment {
 
     @Override
     public void onAttach(Activity activity) {
-         super.onAttach(activity);
-         /*try {
-             //mListener = (DeptListener) activity;
-             } catch (ClassCastException e) {
-             throw new ClassCastException(activity.toString()
-                     + " must implement DeptListener");
-             }*/
-         }
+        super.onAttach(activity);
+        if (activity instanceof LigneFragmentCallback)
+            ligneFragmentCallBack = (LigneFragmentCallback) activity;
+    }
+
     @Override
     public void onDetach() {
-         super.onDetach();
-         //mListener = null;
-         }
+        super.onDetach();
+        ligneFragmentCallBack = null;
+    }
 
     public void updateTime(int hourOfDay, int minute) {
         buttonTime.setText(new String(hourOfDay + " : " + minute));
