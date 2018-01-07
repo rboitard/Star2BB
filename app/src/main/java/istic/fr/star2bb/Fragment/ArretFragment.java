@@ -49,6 +49,7 @@ public class ArretFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        System.out.println("start arret");
         super.onViewCreated(view, savedInstanceState);
         arretView = (ListView) view.findViewById(R.id.arretView);
 
@@ -63,33 +64,26 @@ public class ArretFragment extends Fragment {
 
         }
 
-        String[] projection = new String[]{StarContract.Trips.TripColumns._ID,
-                StarContract.BusRoutes.BusRouteColumns.SHORT_NAME,
-                StarContract.BusRoutes.BusRouteColumns.LONG_NAME,
-                StarContract.BusRoutes.BusRouteColumns.COLOR
+        String[] projection = new String[]{StarContract.Trips.TripColumns.ROUTE_ID,
+                StarContract.Trips.TripColumns.DIRECTION_ID,
+                StarContract.Trips.TripColumns.HEADSIGN
         };
-        String selection = "_ID = ?";
-        String[] selectionArguments = new String[] {"101"};
+        String selection = "ROUTE_ID = ?";
+        String[] selectionArguments = new String[] {
+                "0062"
+        };
         String sortOrder = null;
 
-        listLigne = new ArrayList<String[][]>();
-        mapLigneDir = new HashMap<String, String>();
-        mapLigneId = new HashMap<String, String>();
-        try {
-            String  myType = yourCR.getType(uri);
-            Cursor cursor = getActivity().getContentResolver().query(Uri.parse("content://fr.istic.starproviderBB/busroute/"), projection, null, null, null);
-            while (cursor.moveToNext()) {
-                String [][] strings = new String[1][2];
-                strings[0][0] = cursor.getString(1);
-                strings[0][1] = cursor.getString(3);
-                listLigne.add(strings);
-                mapLigneDir.put(cursor.getString(1),cursor.getString(2));
-                mapLigneId.put(cursor.getString(1),cursor.getString(0));
-            }
+
+        Cursor cursor = getActivity().getContentResolver().query(Uri.parse("content://fr.istic.starproviderBB/trip/"), projection, null, null, null);
+        while (cursor.moveToNext()) {
+            /*TextView text = new TextView(getActivity());
+            text.setText(cursor.getString(2));
+            arretView.addView(text);*/
+            System.out.println("Route_id : " + cursor.getString(1));
         }
-        catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        System.out.println("end");
+
     }
 
 

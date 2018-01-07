@@ -24,11 +24,11 @@ public class MainActivity extends Activity implements LigneFragment.LigneFragmen
         setContentView(R.layout.activity_main);
         fragmentManager = this.getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.fragmentLayout,LigneFragment.newInstance()).commit();
-        //ligneFragement = (LigneFragment) fragmentManager.findFragmentById(R.id.fragmentLigne);
     }
 
     @Override
     public void SelectionLigneClicked(int idBus, int dir) {
         fragmentManager.beginTransaction().replace(R.id.fragmentLayout,ArretFragment.newInstance(idBus, dir)).commit();
     }
+
 }

@@ -90,14 +90,11 @@ public class LigneFragment extends Fragment {
 
 
 
-        String[] projection = new String[]{StarContract.BusRoutes.BusRouteColumns._ID,
+        String[] projection = new String[]{StarContract.BusRoutes.BusRouteColumns.ROUTE_ID,
                 StarContract.BusRoutes.BusRouteColumns.SHORT_NAME,
                 StarContract.BusRoutes.BusRouteColumns.LONG_NAME,
                 StarContract.BusRoutes.BusRouteColumns.COLOR
                 };
-        String selection = "_ID = ?";
-        String[] selectionArguments = new String[] {"101"};
-        String sortOrder = null;
 
         listLigne = new ArrayList<String[][]>();
         mapLigneDir = new HashMap<String, String>();
@@ -140,7 +137,6 @@ public class LigneFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 direction = position;
-                System.out.println(idBus + " / " + direction);
             }
 
             @Override
