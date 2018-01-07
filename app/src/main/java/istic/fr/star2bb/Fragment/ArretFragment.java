@@ -68,21 +68,20 @@ public class ArretFragment extends Fragment {
                 StarContract.Trips.TripColumns.DIRECTION_ID,
                 StarContract.Trips.TripColumns.HEADSIGN
         };
-        String selection = "ROUTE_ID = ?";
+        String selection = "ROUTE_ID = ? AND DIRECTION_ID = ?";
         String[] selectionArguments = new String[] {
-                "0062"
+                Integer.toString(ligne),
+                Integer.toString(dir)
         };
         String sortOrder = null;
 
 
-        Cursor cursor = getActivity().getContentResolver().query(Uri.parse("content://fr.istic.starproviderBB/trip/"), projection, null, null, null);
+        Cursor cursor = getActivity().getContentResolver().query(Uri.parse("content://fr.istic.starproviderBB/trip/"), projection, selection, selectionArguments, null);
         while (cursor.moveToNext()) {
-            /*TextView text = new TextView(getActivity());
+            TextView text = new TextView(getActivity());
             text.setText(cursor.getString(2));
-            arretView.addView(text);*/
-            System.out.println("Route_id : " + cursor.getString(1));
+            arretView.addView(text);
         }
-        System.out.println("end");
 
     }
 
